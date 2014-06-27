@@ -18,25 +18,8 @@ def agent_auth(transport, username):
     keys available from an SSH agent.
     """
     
-    agent = paramiko.Agent()
-    agent_keys = agent.get_keys()
-    if len(agent_keys) == 0:
-        return
-        
-    for key in agent_keys:
-        print 'Trying ssh-agent key %s' % hexlify(key.get_fingerprint()),
-        try:
-            transport.auth_publickey(username, key)
-            print '... success!'
-            return
-        except paramiko.SSHException:
-            print '... nope.'
 
 
-def manual_auth(username, hostname):
-
-        pw = getpass.getpass('Password for %s@%s: ' % (username, hostname))
-        t.auth_password(username, pw)
 
 
 # setup logging
@@ -85,23 +68,39 @@ try:
 
     # check server's host key -- this is important.
     key = t.get_remote_server_key()
-    if not keys.has_key(hostname):
-        print '*** WARNING: Unknown host key!'
-    elif not keys[hostname].has_key(key.get_name()):
-        print '*** WARNING: Unknown host key!'
-    elif keys[hostname][key.get_name()] != key:
-        print '*** WARNING: Host key has changed!!!'
-        sys.exit(1)
-    else:
-        print '*** Host key OK.'
+    # if not keys.has_key(hostname):
+    #     print '*** WARNING: Unknown host key!'
+    # elif not keys[hostname].has_key(key.get_name()):
+    #     print '*** WARNING: Unknown host key!'
+    # elif keys[hostname][key.get_name()] != key:
+    #     print '*** WARNING: Host key has changed!!!'
+    #     sys.exit(1)
+    # else:
+    #     print '*** Host key OK.'
 
     # get username
     username = 'radadmin'
 
 
-    agent_auth(t, username)
+    # agent = paramiko.Agent()
+    # agent_keys = agent.get_keys()
+    # if len(agent_keys) == 0:
+    #     pass
+        
+    # for key in agent_keys:
+    #     print 'Trying ssh-agent key %s' % hexlify(key.get_fingerprint()),
+    #     try:
+    #         transport.auth_publickey(username, key)
+    #         print '... success!'
+            
+    #     except paramiko.SSHException:
+    #         print '... nope.'
+
+
+    #agent_auth(t, username)
     if not t.is_authenticated():
-        manual_auth(username, hostname)
+        pw = getpass.getpass('Password for %s@%s: ' % (username, hostname))
+        t.auth_password(username, pw)
     if not t.is_authenticated():
         print '*** Authentication failed. :('
         t.close()
